@@ -19,6 +19,7 @@
 #ifndef ORBEXTRACTOR_H
 #define ORBEXTRACTOR_H
 
+#include <string>
 #include <vector>
 #include <list>
 #include <opencv2/opencv.hpp>
@@ -58,8 +59,8 @@ public:
                    std::vector<cv::KeyPoint> &_keypoints,
                    cv::OutputArray _descriptors,
                    std::vector<int> &vLappingArea, 
-                   string kpFilename = "", 
-                   string descFilename = "");
+                   std::string kpFilename = "", 
+                   std::string descFilename = "");
 
     int inline GetLevels(){
         return nlevels;}

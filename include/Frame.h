@@ -71,7 +71,7 @@ public:
     // ~Frame();
 
     // Extract ORB on the image. 0 for left image and 1 for right image.
-    void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1);
+    void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1, string kpFilename = "", string descFilename = "");
 
     // Compute Bag of Words representation.
     void ComputeBoW();
