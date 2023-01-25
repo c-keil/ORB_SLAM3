@@ -58,6 +58,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 #include "ORBextractor.h"
 
@@ -1084,7 +1085,8 @@ namespace ORB_SLAM3
     }
 
     int ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
-                                  OutputArray _descriptors, std::vector<int> &vLappingArea)
+                                  OutputArray _descriptors, std::vector<int> &vLappingArea,
+                                  string kpFilename, string descFilename)
     {
         //cout << "[ORBextractor]: Max Features: " << nfeatures << endl;
         if(_image.empty())
@@ -1096,73 +1098,144 @@ namespace ORB_SLAM3
         // Pre-compute the scale pyramid
         ComputePyramid(image);
 
-        vector < vector<KeyPoint> > allKeypoints;
-        ComputeKeyPointsOctTree(allKeypoints);
-        //ComputeKeyPointsOld(allKeypoints);
-
-        Mat descriptors;
-
+        int monoIndex = 0;
         int nkeypoints = 0;
-        for (int level = 0; level < nlevels; ++level)
-            nkeypoints += (int)allKeypoints[level].size();
-        if( nkeypoints == 0 )
-            _descriptors.release();
-        else
+
+        //load keypoints
+        vector<KeyPoint> keypoints;
+        vector<double> row;
+        string line, word;
+        KeyPoint kp;
+        std::fstream kp_file(kpFilename, ios::in);
+        if (kp_file.is_open())
         {
-            _descriptors.create(nkeypoints, 32, CV_8U);
-            descriptors = _descriptors.getMat();
-        }
+            while (std::getline(kp_file, line))
+            {
+                row.clear();
+                std::stringstream str(line);
 
-        //_keypoints.clear();
-        //_keypoints.reserve(nkeypoints);
-        _keypoints = vector<cv::KeyPoint>(nkeypoints);
-
-        int offset = 0;
-        //Modified for speeding up stereo fisheye matching
-        int monoIndex = 0, stereoIndex = nkeypoints-1;
-        for (int level = 0; level < nlevels; ++level)
-        {
-            vector<KeyPoint>& keypoints = allKeypoints[level];
-            int nkeypointsLevel = (int)keypoints.size();
-
-            if(nkeypointsLevel==0)
-                continue;
-
-            // preprocess the resized image
-            Mat workingMat = mvImagePyramid[level].clone();
-            GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
-
-            // Compute the descriptors
-            //Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
-            Mat desc = cv::Mat(nkeypointsLevel, 32, CV_8U);
-            computeDescriptors(workingMat, keypoints, desc, pattern);
-
-            offset += nkeypointsLevel;
-
-
-            float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
-            int i = 0;
-            for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
-                         keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint){
-
-                // Scale keypoint coordinates
-                if (level != 0){
-                    keypoint->pt *= scale;
+                while (std::getline(str, word, ' '))
+                {
+                    row.push_back(stod(word));
                 }
-
-                if(keypoint->pt.x >= vLappingArea[0] && keypoint->pt.x <= vLappingArea[1]){
-                    _keypoints.at(stereoIndex) = (*keypoint);
-                    desc.row(i).copyTo(descriptors.row(stereoIndex));
-                    stereoIndex--;
-                }
-                else{
-                    _keypoints.at(monoIndex) = (*keypoint);
-                    desc.row(i).copyTo(descriptors.row(monoIndex));
-                    monoIndex++;
-                }
-                i++;
+                kp.pt.x = row[0];
+                kp.pt.y = row[1];
+                kp.size = row[2];
+                kp.angle = row[3];
+                kp.response = row[4];
+                kp.octave = row[5];
+                kp.class_id = row[6];
+                keypoints.push_back(kp);
             }
         }
+        else
+            std::cout << "Could not open keypoint file\n";
+
+        // load descriptors
+        // descriptor matrix params
+        int rows = 1000;
+        int cols = 256;
+        int row_index = 0;
+        cv::Mat descriptors = _descriptors.getMat();
+        descriptors.create(rows, cols, CV_32F);
+        // read descriptor files
+        std::fstream desc_file(descFilename, std::ios::in);
+        row_index = 0;
+        if (desc_file.is_open())
+        {
+            while (std::getline(desc_file, line))
+            {
+                cv::Mat desc;
+                std::stringstream str(line);
+
+                while (std::getline(str, word, ' '))
+                {
+                    desc.push_back(float(stod(word)));
+                }
+
+                cv::Mat desct = desc.t();
+                desct.copyTo(descriptors.row(row_index));
+                row_index++;
+            }
+        }
+        else
+            std::cout << "Could not open the descriptor file\n";
+
+        monoIndex = keypoints.size(); //TODO IR confirm this is appropriate
+        nkeypoints = keypoints.size();
+        // _keypoints = vector<cv::KeyPoint>(nkeypoints);
+        _keypoints = keypoints;
+        _descriptors.create(nkeypoints, 32, CV_32F);
+        // _descriptors = descriptors;
+
+        // vector < vector<KeyPoint> > allKeypoints;
+        // ComputeKeyPointsOctTree(allKeypoints);
+        // //ComputeKeyPointsOld(allKeypoints);
+
+        // Mat descriptors;
+
+        // int nkeypoints = 0;
+        // for (int level = 0; level < nlevels; ++level)
+        //     nkeypoints += (int)allKeypoints[level].size();
+        // if( nkeypoints == 0 )
+        //     _descriptors.release();
+        // else
+        // {
+        //     _descriptors.create(nkeypoints, 32, CV_8U);
+        //     descriptors = _descriptors.getMat();
+        // }
+
+        // //_keypoints.clear();
+        // //_keypoints.reserve(nkeypoints);
+        // _keypoints = vector<cv::KeyPoint>(nkeypoints);
+
+        // int offset = 0;
+        // //Modified for speeding up stereo fisheye matching
+        // int monoIndex = 0, stereoIndex = nkeypoints-1;
+        // for (int level = 0; level < nlevels; ++level)
+        // {
+        //     vector<KeyPoint>& keypoints = allKeypoints[level];
+        //     int nkeypointsLevel = (int)keypoints.size();
+
+        //     if(nkeypointsLevel==0)
+        //         continue;
+
+        //     // preprocess the resized image
+        //     Mat workingMat = mvImagePyramid[level].clone();
+        //     GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
+
+        //     // Compute the descriptors
+        //     //Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
+        //     Mat desc = cv::Mat(nkeypointsLevel, 32, CV_8U);
+        //     computeDescriptors(workingMat, keypoints, desc, pattern);
+
+        //     offset += nkeypointsLevel;
+
+
+        //     float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
+        //     int i = 0;
+        //     for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
+        //                  keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint){
+
+        //         // Scale keypoint coordinates
+        //         if (level != 0){
+        //             keypoint->pt *= scale;
+        //         }
+
+        //         if(keypoint->pt.x >= vLappingArea[0] && keypoint->pt.x <= vLappingArea[1]){
+        //             _keypoints.at(stereoIndex) = (*keypoint);
+        //             desc.row(i).copyTo(descriptors.row(stereoIndex));
+        //             stereoIndex--;
+        //         }
+        //         else{
+        //             _keypoints.at(monoIndex) = (*keypoint);
+        //             desc.row(i).copyTo(descriptors.row(monoIndex));
+        //             monoIndex++;
+        //         }
+        //         i++;
+        //     }
+        // }
+
         //cout << "[ORBextractor]: extracted " << _keypoints.size() << " KeyPoints" << endl;
         return monoIndex;
     }
