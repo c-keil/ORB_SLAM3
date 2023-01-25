@@ -1144,8 +1144,9 @@ namespace ORB_SLAM3
         int rows = numKpRead; 
         int cols = 256;
         int row_index = 0;
+        _descriptors.create(rows, cols, CV_32F);
         cv::Mat descriptors = _descriptors.getMat();
-        descriptors.create(rows, cols, CV_32F);
+
         // read descriptor files
         std::fstream desc_file(descFilename, std::ios::in);
         std::cout << "Reading: " << descFilename << std::endl;
@@ -1177,8 +1178,8 @@ namespace ORB_SLAM3
         nkeypoints = keypoints.size();
         // _keypoints = vector<cv::KeyPoint>(nkeypoints);
         _keypoints = keypoints;
-        _descriptors.create(nkeypoints, 32, CV_32F);
-        // _descriptors = descriptors;
+        //_descriptors.create(nkeypoints, 32, CV_32F);
+        //_descriptors = descriptors;
 
         // vector < vector<KeyPoint> > allKeypoints;
         // ComputeKeyPointsOctTree(allKeypoints);
