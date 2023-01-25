@@ -416,11 +416,11 @@ void Frame::AssignFeaturesToGrid()
 }
 
 //TODO modify for IRPoint
-void Frame::ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1, string kpFilename, string descFilename)
+void Frame::ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1)
 {
     vector<int> vLapping = {x0,x1};
     if(flag==0)
-        monoLeft = (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors,vLapping, kpFilename, descFilename);
+        monoLeft = (*mpORBextractorLeft)(im,cv::Mat(),mvKeys,mDescriptors,vLapping,irkpFilename,irdescFilename);
     else
         monoRight = (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight,vLapping);
 }

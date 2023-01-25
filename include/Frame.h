@@ -21,6 +21,7 @@
 #define FRAME_H
 
 #include<vector>
+#include<string>
 
 #include "Thirdparty/DBoW2/DBoW2/BowVector.h"
 #include "Thirdparty/DBoW2/DBoW2/FeatureVector.h"
@@ -71,7 +72,7 @@ public:
     // ~Frame();
 
     // Extract ORB on the image. 0 for left image and 1 for right image.
-    void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1, string kpFilename = "", string descFilename = "");
+    void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1);//, std::string kpFilename = "", std::string descFilename = "");
 
     // Compute Bag of Words representation.
     void ComputeBoW();
