@@ -83,11 +83,11 @@ int main(int argc, char **argv)
     // Main loop
     cv::Mat im;
     int proccIm = 0;
-    for(int ni=0; ni<nImages; ni++, proccIm++)
+    for(int ni=250; ni<nImages; ni++, proccIm++)
     {
 
         // Read image from file
-        im = cv::imread(strImageFilenames[ni],cv::IMREAD_UNCHANGED); //,CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(strImageFilenames[ni],cv::IMREAD_GRAYSCALE); //,CV_LOAD_IMAGE_UNCHANGED);
         double tframe = TimestampsCam[ni];
 
         if(im.empty())

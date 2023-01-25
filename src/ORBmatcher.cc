@@ -672,8 +672,8 @@ namespace ORB_SLAM3
 
             cv::Mat d1 = F1.mDescriptors.row(i1);
 
-            int bestDist = INT_MAX;
-            int bestDist2 = INT_MAX;
+            double bestDist = INT_MAX;
+            double bestDist2 = INT_MAX;
             int bestIdx2 = -1;
 
             for(vector<size_t>::iterator vit=vIndices2.begin(); vit!=vIndices2.end(); vit++)
@@ -682,7 +682,7 @@ namespace ORB_SLAM3
 
                 cv::Mat d2 = F2.mDescriptors.row(i2);
 
-                int dist = DescriptorDistance(d1,d2);
+                double dist = DescriptorDistance(d1,d2);
 
                 if(vMatchedDistance[i2]<=dist)
                     continue;
@@ -699,7 +699,7 @@ namespace ORB_SLAM3
                 }
             }
 
-            if(bestDist<=TH_LOW)
+            if(bestDist<=0.7)
             {
                 if(bestDist<(float)bestDist2*mfNNratio)
                 {
