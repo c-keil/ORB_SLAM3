@@ -1093,7 +1093,7 @@ namespace ORB_SLAM3
             return -1;
 
         Mat image = _image.getMat();
-        assert(image.type() == CV_8UC1 );
+        // assert(image.type() == CV_8UC1 );
 
         // Pre-compute the scale pyramid
         ComputePyramid(image);
