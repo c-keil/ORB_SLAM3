@@ -43,13 +43,13 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    const int num_seq = 1;
+    // const int num_seq = 1;
     string file_name = string(argv[3]);
     string timestamp_file = string(argv[4]);
     cout << "file name: " << file_name << endl;
 
-    // Load all sequences:
-    int seq;
+    // Load sequence:
+    // int seq;
     vector<string> strImageFilenames, strKpFilenames, strDescFilenames;
     vector<double> TimestampsCam;
 
@@ -128,7 +128,9 @@ int main(int argc, char **argv)
 
         // Pass the image to the SLAM system
         // cout << "tframe = " << tframe << endl;
-        SLAM.TrackMonocular(im,tframe); 
+        vector<ORB_SLAM3::IMU::Point> dummyVec;
+        SLAM.TrackMonocular(im, tframe, dummyVec, "");
+        // SLAM.TrackMonocular(im, tframe, dummyVec, "", strKpFilenames[ni], strDescFilenames[ni]);
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -161,8 +163,8 @@ int main(int argc, char **argv)
         }
     }
 
-    string kf_file_submap =  "./SubMaps/kf_SubMap_" + std::to_string(seq) + ".txt";
-    string f_file_submap =  "./SubMaps/f_SubMap_" + std::to_string(seq) + ".txt";
+    string kf_file_submap =  "./SubMaps/kf_SubMap.txt";
+    string f_file_submap =  "./SubMaps/f_SubMap.txt";
     SLAM.SaveTrajectoryEuRoC(f_file_submap);
     SLAM.SaveKeyFrameTrajectoryEuRoC(kf_file_submap);
 
