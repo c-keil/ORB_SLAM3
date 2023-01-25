@@ -29,6 +29,7 @@
 #include"KeyFrame.h"
 #include"Frame.h"
 
+//TODO Orb Matcher uses integer distances, but we have double distances... need to resolve
 
 namespace ORB_SLAM3
 {
@@ -40,7 +41,8 @@ namespace ORB_SLAM3
         ORBmatcher(float nnratio=0.6, bool checkOri=true);
 
         // Computes the Hamming distance between two ORB descriptors
-        static int DescriptorDistance(const cv::Mat &a, const cv::Mat &b);
+        //modified to compute the l2 norm between IRpoint descriptors
+        static double DescriptorDistance(const cv::Mat &a, const cv::Mat &b);
 
         // Search matches between Frame keypoints and projected MapPoints. Returns number of matches
         // Used to track the local map (Tracking)
