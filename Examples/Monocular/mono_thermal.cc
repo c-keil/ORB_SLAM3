@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     {
 
         // Read image from file
-        im = cv::imread(strImageFilenames[ni],cv::IMREAD_UNCHANGED); //,CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(strImageFilenames[ni],cv::IMREAD_GRAYSCALE); //,CV_LOAD_IMAGE_UNCHANGED);
         double tframe = TimestampsCam[ni];
 
         if(im.empty())
