@@ -129,8 +129,8 @@ int main(int argc, char **argv)
         // Pass the image to the SLAM system
         // cout << "tframe = " << tframe << endl;
         vector<ORB_SLAM3::IMU::Point> dummyVec;
-        SLAM.TrackMonocular(im, tframe, dummyVec, "");
-        // SLAM.TrackMonocular(im, tframe, dummyVec, "", strKpFilenames[ni], strDescFilenames[ni]);
+        // SLAM.TrackMonocular(im, tframe, dummyVec, "");
+        SLAM.TrackMonocular(im, tframe, dummyVec, "", strKpFilenames[ni], strDescFilenames[ni]);
 
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();

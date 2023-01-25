@@ -2070,7 +2070,7 @@ namespace ORB_SLAM3
         //     dist += (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
         // }
         // cv::Mat vec = a - b;
-        double dist = cv::norm(1, b, cv::NORM_L2);
+        double dist = cv::norm(a, b, cv::NORM_L2);
 
         return dist;
     }

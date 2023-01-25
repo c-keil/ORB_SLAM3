@@ -1088,12 +1088,12 @@ namespace ORB_SLAM3
                                   OutputArray _descriptors, std::vector<int> &vLappingArea,
                                   string kpFilename, string descFilename)
     {
-        //cout << "[ORBextractor]: Max Features: " << nfeatures << endl;
+        // cout << "[ORBextractor]: Max Features: " << nfeatures << endl;
         if(_image.empty())
             return -1;
 
         Mat image = _image.getMat();
-        assert(image.type() == CV_8UC1 );
+        // assert(image.type() == CV_8UC1 );
 
         // Pre-compute the scale pyramid
         ComputePyramid(image);
@@ -1106,11 +1106,16 @@ namespace ORB_SLAM3
         vector<double> row;
         string line, word;
         KeyPoint kp;
+        int numFeaturesToRead = nfeatures; // TODO this is the number of descriptors to extract should not be hardcoded
+        int numKpRead = 0;
         std::fstream kp_file(kpFilename, ios::in);
+        std::cout << "Reading: " << kpFilename << std::endl;
         if (kp_file.is_open())
         {
             while (std::getline(kp_file, line))
-            {
+            {   
+                if (numKpRead == numFeaturesToRead) break;
+
                 row.clear();
                 std::stringstream str(line);
 
@@ -1126,25 +1131,30 @@ namespace ORB_SLAM3
                 kp.octave = row[5];
                 kp.class_id = row[6];
                 keypoints.push_back(kp);
+                numKpRead++;
             }
         }
         else
             std::cout << "Could not open keypoint file\n";
+        // assert(numKpRead == numFeaturesToRead);
+        std::cout << "Read " << numKpRead << " keypoins" << std::endl;
 
         // load descriptors
         // descriptor matrix params
-        int rows = 1000;
+        int rows = numKpRead; 
         int cols = 256;
         int row_index = 0;
         cv::Mat descriptors = _descriptors.getMat();
         descriptors.create(rows, cols, CV_32F);
         // read descriptor files
         std::fstream desc_file(descFilename, std::ios::in);
+        std::cout << "Reading: " << descFilename << std::endl;
         row_index = 0;
         if (desc_file.is_open())
         {
             while (std::getline(desc_file, line))
             {
+                if (row_index == descriptors.rows) break;
                 cv::Mat desc;
                 std::stringstream str(line);
 
@@ -1160,6 +1170,8 @@ namespace ORB_SLAM3
         }
         else
             std::cout << "Could not open the descriptor file\n";
+        std::cout << "Read " << row_index << " descriptors" << std::endl;
+        assert(row_index == numKpRead );
 
         monoIndex = keypoints.size(); //TODO IR confirm this is appropriate
         nkeypoints = keypoints.size();
