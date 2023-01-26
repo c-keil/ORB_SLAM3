@@ -1106,7 +1106,6 @@ namespace ORB_SLAM3
         vector<double> row;
         string line, word;
         KeyPoint kp;
-        int numFeaturesToRead = nfeatures; // TODO this is the number of descriptors to extract should not be hardcoded
         int numKpRead = 0;
         std::fstream kp_file(kpFilename, ios::in);
         std::cout << "Reading: " << kpFilename << std::endl;
@@ -1114,7 +1113,7 @@ namespace ORB_SLAM3
         {
             while (std::getline(kp_file, line))
             {   
-                if (numKpRead == numFeaturesToRead) break;
+                if (numKpRead == nfeatures) break;
 
                 row.clear();
                 std::stringstream str(line);
@@ -1136,7 +1135,7 @@ namespace ORB_SLAM3
         }
         else
             std::cout << "Could not open keypoint file\n";
-        // assert(numKpRead == numFeaturesToRead);
+        // assert(numKpRead == nfeatures);
         std::cout << "Read " << numKpRead << " keypoins" << std::endl;
 
         // load descriptors
