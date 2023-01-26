@@ -1,6 +1,6 @@
 # Ignore all
 *
-*.yml
+Vocabulary/*
 # Unignore all with extensions
 !*.*
 

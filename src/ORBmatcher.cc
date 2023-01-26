@@ -32,8 +32,8 @@ using namespace std;
 namespace ORB_SLAM3
 {
 
-    const int ORBmatcher::TH_HIGH = 100;
-    const int ORBmatcher::TH_LOW = 50;
+    const double ORBmatcher::TH_HIGH = 0.9    ;//100;
+    const double ORBmatcher::TH_LOW = 0.7  ; //50;
     const int ORBmatcher::HISTO_LENGTH = 30;
 
     ORBmatcher::ORBmatcher(float nnratio, bool checkOri): mfNNratio(nnratio), mbCheckOrientation(checkOri)
@@ -74,9 +74,9 @@ namespace ORB_SLAM3
                 if(!vIndices.empty()){
                     const cv::Mat MPdescriptor = pMP->GetDescriptor();
 
-                    int bestDist=256;
+                    double bestDist=256;
                     int bestLevel= -1;
-                    int bestDist2=256;
+                    double bestDist2=256;
                     int bestLevel2 = -1;
                     int bestIdx =-1 ;
 
@@ -154,9 +154,9 @@ namespace ORB_SLAM3
 
                     const cv::Mat MPdescriptor = pMP->GetDescriptor();
 
-                    int bestDist=256;
+                    double bestDist=256;
                     int bestLevel= -1;
-                    int bestDist2=256;
+                    double bestDist2=256;
                     int bestLevel2 = -1;
                     int bestIdx =-1 ;
 
@@ -262,13 +262,13 @@ namespace ORB_SLAM3
 
                     const cv::Mat &dKF= pKF->mDescriptors.row(realIdxKF);
 
-                    int bestDist1=256;
+                    double bestDist1=256;
                     int bestIdxF =-1 ;
-                    int bestDist2=256;
+                    double bestDist2=256;
 
-                    int bestDist1R=256;
+                    double bestDist1R=256;
                     int bestIdxFR =-1 ;
-                    int bestDist2R=256;
+                    double bestDist2R=256;
 
                     for(size_t iF=0; iF<vIndicesF.size(); iF++)
                     {
@@ -496,7 +496,7 @@ namespace ORB_SLAM3
             // Match to the most similar keypoint in the radius
             const cv::Mat dMP = pMP->GetDescriptor();
 
-            int bestDist = 256;
+            double bestDist = 256;
             int bestIdx = -1;
             for(vector<size_t>::const_iterator vit=vIndices.begin(), vend=vIndices.end(); vit!=vend; vit++)
             {
@@ -609,7 +609,7 @@ namespace ORB_SLAM3
             // Match to the most similar keypoint in the radius
             const cv::Mat dMP = pMP->GetDescriptor();
 
-            int bestDist = 256;
+            double bestDist = 256;
             int bestIdx = -1;
             for(vector<size_t>::const_iterator vit=vIndices.begin(), vend=vIndices.end(); vit!=vend; vit++)
             {
@@ -809,9 +809,9 @@ namespace ORB_SLAM3
 
                     const cv::Mat &d1 = Descriptors1.row(idx1);
 
-                    int bestDist1=256;
+                    double bestDist1=256;
                     int bestIdx2 =-1 ;
-                    int bestDist2=256;
+                    double bestDist2=256;
 
                     for(size_t i2=0, iend2=f2it->second.size(); i2<iend2; i2++)
                     {
@@ -831,7 +831,7 @@ namespace ORB_SLAM3
 
                         const cv::Mat &d2 = Descriptors2.row(idx2);
 
-                        int dist = DescriptorDistance(d1,d2);
+                        double dist = DescriptorDistance(d1,d2);
 
                         if(dist<bestDist1)
                         {
@@ -991,7 +991,7 @@ namespace ORB_SLAM3
 
                     const cv::Mat &d1 = pKF1->mDescriptors.row(idx1);
 
-                    int bestDist = TH_LOW;
+                    double bestDist = TH_LOW;
                     int bestIdx2 = -1;
 
                     for(size_t i2=0, iend2=f2it->second.size(); i2<iend2; i2++)
@@ -1255,7 +1255,7 @@ namespace ORB_SLAM3
 
             const cv::Mat dMP = pMP->GetDescriptor();
 
-            int bestDist = 256;
+            double bestDist = 256;
             int bestIdx = -1;
             for(vector<size_t>::const_iterator vit=vIndices.begin(), vend=vIndices.end(); vit!=vend; vit++)
             {
@@ -1412,7 +1412,7 @@ namespace ORB_SLAM3
 
             const cv::Mat dMP = pMP->GetDescriptor();
 
-            int bestDist = INT_MAX;
+            double bestDist = INT_MAX;
             int bestIdx = -1;
             for(vector<size_t>::const_iterator vit=vIndices.begin(); vit!=vIndices.end(); vit++)
             {
@@ -1424,7 +1424,7 @@ namespace ORB_SLAM3
 
                 const cv::Mat &dKF = pKF->mDescriptors.row(idx);
 
-                int dist = DescriptorDistance(dMP,dKF);
+                double dist = DescriptorDistance(dMP,dKF);
 
                 if(dist<bestDist)
                 {
@@ -1544,7 +1544,7 @@ namespace ORB_SLAM3
             // Match to the most similar keypoint in the radius
             const cv::Mat dMP = pMP->GetDescriptor();
 
-            int bestDist = INT_MAX;
+            double bestDist = INT_MAX;
             int bestIdx = -1;
             for(vector<size_t>::const_iterator vit=vIndices.begin(), vend=vIndices.end(); vit!=vend; vit++)
             {
@@ -1624,7 +1624,7 @@ namespace ORB_SLAM3
             // Match to the most similar keypoint in the radius
             const cv::Mat dMP = pMP->GetDescriptor();
 
-            int bestDist = INT_MAX;
+            double bestDist = INT_MAX;
             int bestIdx = -1;
             for(vector<size_t>::const_iterator vit=vIndices.begin(), vend=vIndices.end(); vit!=vend; vit++)
             {
@@ -1737,7 +1737,7 @@ namespace ORB_SLAM3
 
                     const cv::Mat dMP = pMP->GetDescriptor();
 
-                    int bestDist = 256;
+                    double bestDist = 256;
                     int bestIdx2 = -1;
 
                     for(vector<size_t>::const_iterator vit=vIndices2.begin(), vend=vIndices2.end(); vit!=vend; vit++)
@@ -1812,7 +1812,7 @@ namespace ORB_SLAM3
 
                         const cv::Mat dMP = pMP->GetDescriptor();
 
-                        int bestDist = 256;
+                        double bestDist = 256;
                         int bestIdx2 = -1;
 
                         for(vector<size_t>::const_iterator vit=vIndices2.begin(), vend=vIndices2.end(); vit!=vend; vit++)
@@ -1943,7 +1943,7 @@ namespace ORB_SLAM3
 
                     const cv::Mat dMP = pMP->GetDescriptor();
 
-                    int bestDist = 256;
+                    double bestDist = 256;
                     int bestIdx2 = -1;
 
                     for(vector<size_t>::const_iterator vit=vIndices2.begin(); vit!=vIndices2.end(); vit++)

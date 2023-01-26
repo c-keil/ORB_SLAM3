@@ -90,8 +90,8 @@ namespace ORB_SLAM3
 
     public:
 
-        static const int TH_LOW;
-        static const int TH_HIGH;
+        static const double TH_LOW;
+        static const double TH_HIGH;
         static const int HISTO_LENGTH;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

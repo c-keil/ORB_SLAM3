@@ -113,10 +113,17 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     {
         //Load ORB Vocabulary
         cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
+        cv::FileStorage vocFS(strVocFile.c_str(), cv::FileStorage::READ);
+        ORBVocabulary Vocabulary;
+        Vocabulary.load(vocFS);
+        mpVocabulary = new ORBVocabulary(Vocabulary);
 
-        mpVocabulary = new ORBVocabulary();
-        bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
-        if(!bVocLoad)
+        vocFS.release();
+
+        //mpVocabulary = new ORBVocabulary();
+        //bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
+       // if(!bVocLoad)
+        if (mpVocabulary->size() <= 0)
         {
             cerr << "Wrong path to vocabulary. " << endl;
             cerr << "Falied to open at: " << strVocFile << endl;
