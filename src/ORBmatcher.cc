@@ -431,21 +431,21 @@ namespace ORB_SLAM3
             }
         }
 
-        int last_slash = F.irkpFilename.find_last_of("/");
-        string F_im_name = F.irkpFilename.substr(last_slash, 20) + ".png";
-        string KF_im_name = pKF->irkpFilename.substr(last_slash, 20) + ".png";
-        string F_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + F_im_name;
-        string KF_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + KF_im_name;
-        cv::Mat F_img = cv::imread(F_img_file_name, cv::IMREAD_COLOR);
-        cv::Mat KF_img = cv::imread(KF_img_file_name, cv::IMREAD_COLOR);
-        cv::Mat img_matches;
-        cv::drawMatches(F_img, F.mvKeys, KF_img, pKF->mvKeys, ir_matches, img_matches, cv::Scalar::all(-1),
-                        cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-        imshow("Frame: " + F_im_name + " , KFrame: " + KF_im_name, img_matches);
-        // save output
-        std::string save_path = "/home/colin/data/" + F_im_name.substr(1,19) + "_" + KF_im_name.substr(1);
-        cv::imwrite(save_path, img_matches);
-        cv::waitKey();
+        // int last_slash = F.irkpFilename.find_last_of("/");
+        // string F_im_name = F.irkpFilename.substr(last_slash, 20) + ".png";
+        // string KF_im_name = pKF->irkpFilename.substr(last_slash, 20) + ".png";
+        // string F_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + F_im_name;
+        // string KF_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + KF_im_name;
+        // cv::Mat F_img = cv::imread(F_img_file_name, cv::IMREAD_COLOR);
+        // cv::Mat KF_img = cv::imread(KF_img_file_name, cv::IMREAD_COLOR);
+        // cv::Mat img_matches;
+        // cv::drawMatches(F_img, F.mvKeys, KF_img, pKF->mvKeys, ir_matches, img_matches, cv::Scalar::all(-1),
+        //                 cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+        // imshow("Frame: " + F_im_name + " , KFrame: " + KF_im_name, img_matches);
+        // // save output
+        // std::string save_path = "/home/colin/data/" + F_im_name.substr(1,19) + "_" + KF_im_name.substr(1);
+        // cv::imwrite(save_path, img_matches);
+        // cv::waitKey();
 
         return nmatches;
     }

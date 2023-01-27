@@ -1136,7 +1136,7 @@ namespace ORB_SLAM3
         else
             std::cout << "Could not open keypoint file\n";
         // assert(numKpRead == nfeatures);
-        std::cout << "Read " << numKpRead << " keypoins" << std::endl;
+        // std::cout << "Read " << numKpRead << " keypoins" << std::endl;
 
         // load descriptors
         // descriptor matrix params
@@ -1148,7 +1148,7 @@ namespace ORB_SLAM3
 
         // read descriptor files
         std::fstream desc_file(descFilename, std::ios::in);
-        std::cout << "Reading: " << descFilename << std::endl;
+        // std::cout << "Reading: " << descFilename << std::endl;
         row_index = 0;
         if (desc_file.is_open())
         {
@@ -1170,7 +1170,7 @@ namespace ORB_SLAM3
         }
         else
             std::cout << "Could not open the descriptor file\n";
-        std::cout << "Read " << row_index << " descriptors" << std::endl;
+        // std::cout << "Read " << row_index << " descriptors" << std::endl;
         assert(row_index == numKpRead );
 
         monoIndex = keypoints.size(); //TODO IR confirm this is appropriate
