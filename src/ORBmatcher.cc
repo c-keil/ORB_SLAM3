@@ -27,6 +27,11 @@
 
 #include<stdint-gcc.h>
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/types.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
 using namespace std;
 
 namespace ORB_SLAM3
@@ -241,6 +246,9 @@ namespace ORB_SLAM3
         DBoW2::FeatureVector::const_iterator KFend = vFeatVecKF.end();
         DBoW2::FeatureVector::const_iterator Fend = F.mFeatVec.end();
 
+        //match debug
+        vector<cv::DMatch> ir_matches;
+
         while(KFit != KFend && Fit != Fend)
         {
             if(KFit->first == Fit->first)
@@ -329,7 +337,8 @@ namespace ORB_SLAM3
                         if(static_cast<float>(bestDist1)<mfNNratio*static_cast<float>(bestDist2))
                         {
                             vpMapPointMatches[bestIdxF]=pMP;
-
+                            //match from frame to kf 
+                            ir_matches.push_back(cv::DMatch(bestIdxF, realIdxKF, 1.0));
                             const cv::KeyPoint &kp =
                                     (!pKF->mpCamera2) ? pKF->mvKeysUn[realIdxKF] :
                                     (realIdxKF >= pKF -> NLeft) ? pKF -> mvKeysRight[realIdxKF - pKF -> NLeft]
@@ -359,7 +368,8 @@ namespace ORB_SLAM3
                             if(static_cast<float>(bestDist1R)<mfNNratio*static_cast<float>(bestDist2R) || true)
                             {
                                 vpMapPointMatches[bestIdxFR]=pMP;
-
+                                // match from frame to kf
+                                ir_matches.push_back(cv::DMatch(bestIdxF, realIdxKF, 1.0));
                                 const cv::KeyPoint &kp =
                                         (!pKF->mpCamera2) ? pKF->mvKeysUn[realIdxKF] :
                                         (realIdxKF >= pKF -> NLeft) ? pKF -> mvKeysRight[realIdxKF - pKF -> NLeft]
@@ -420,6 +430,22 @@ namespace ORB_SLAM3
                 }
             }
         }
+
+        int last_slash = F.irkpFilename.find_last_of("/");
+        string F_im_name = F.irkpFilename.substr(last_slash, 20) + ".png";
+        string KF_im_name = pKF->irkpFilename.substr(last_slash, 20) + ".png";
+        string F_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + F_im_name;
+        string KF_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + KF_im_name;
+        cv::Mat F_img = cv::imread(F_img_file_name, cv::IMREAD_COLOR);
+        cv::Mat KF_img = cv::imread(KF_img_file_name, cv::IMREAD_COLOR);
+        cv::Mat img_matches;
+        cv::drawMatches(F_img, F.mvKeys, KF_img, pKF->mvKeys, ir_matches, img_matches, cv::Scalar::all(-1),
+                        cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+        imshow("Frame: " + F_im_name + " , KFrame: " + KF_im_name, img_matches);
+        // save output
+        std::string save_path = "/home/colin/data/" + F_im_name.substr(1,19) + "_" + KF_im_name.substr(1);
+        cv::imwrite(save_path, img_matches);
+        cv::waitKey();
 
         return nmatches;
     }

@@ -423,6 +423,7 @@ public:
 
     //bool mbHasHessian;
     //cv::Mat mHessianPose;
+    std::string irkpFilename;
 
     // The following variables need to be accessed trough a mutex to be thread safe.
 protected:
