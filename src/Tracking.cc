@@ -1608,9 +1608,9 @@ Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &times
 #endif
 
     lastID = mCurrentFrame.mnId;
-    cout << "tracking started mono" << endl;
+    cout << "tracking started mono - " << mCurrentFrame.irkpFilename << endl;
     Track();
-    cout << "tracking ended mono" << endl;
+    // cout << "tracking ended mono" << endl;
 
     return mCurrentFrame.GetPose();
 }

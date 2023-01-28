@@ -1108,7 +1108,7 @@ namespace ORB_SLAM3
         KeyPoint kp;
         int numKpRead = 0;
         std::fstream kp_file(kpFilename, ios::in);
-        std::cout << "Reading: " << kpFilename << std::endl;
+        // std::cout << "Reading: " << kpFilename << std::endl;
         if (kp_file.is_open())
         {
             while (std::getline(kp_file, line))
