@@ -20,6 +20,8 @@
 #include "ORBmatcher.h"
 
 #include<limits.h>
+#include<fstream>
+#include<iostream>
 
 #include<opencv2/core/core.hpp>
 
@@ -38,7 +40,8 @@ namespace ORB_SLAM3
 {
 
     const double ORBmatcher::TH_HIGH = 0.9    ;//100;
-    const double ORBmatcher::TH_LOW = 0.7  ; //50;
+    // const double ORBmatcher::TH_LOW = 0.6;     // 50;
+    const double ORBmatcher::TH_LOW = 0.7;     // 50;
     const int ORBmatcher::HISTO_LENGTH = 30;
 
     ORBmatcher::ORBmatcher(float nnratio, bool checkOri): mfNNratio(nnratio), mbCheckOrientation(checkOri)
@@ -431,23 +434,35 @@ namespace ORB_SLAM3
             }
         }
 
-        // int last_slash = F.irkpFilename.find_last_of("/");
-        // string F_im_name = F.irkpFilename.substr(last_slash, 20) + ".png";
-        // string KF_im_name = pKF->irkpFilename.substr(last_slash, 20) + ".png";
-        // string F_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + F_im_name;
-        // string KF_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + KF_im_name;
-        // cv::Mat F_img = cv::imread(F_img_file_name, cv::IMREAD_COLOR);
-        // cv::Mat KF_img = cv::imread(KF_img_file_name, cv::IMREAD_COLOR);
-        // cv::Mat img_matches;
-        // cv::drawMatches(F_img, F.mvKeys, KF_img, pKF->mvKeys, ir_matches, img_matches, cv::Scalar::all(-1),
-        //                 cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-        // imshow("Frame: " + F_im_name + " , KFrame: " + KF_im_name, img_matches);
-        // // save output
-        // std::string save_path = "/home/colin/data/" + F_im_name.substr(1,19) + "_" + KF_im_name.substr(1);
-        // cv::imwrite(save_path, img_matches);
-        // cv::waitKey();
+        // write matches to file for confirmation
+         //save matches to file
+         ofstream file;
+         file.open("/home/colin/Software/ORB_SLAM3/BoWMatches.txt");
+         file << F.irkpFilename << "\n";
+         file << pKF->irkpFilename << "\n";
+         for(size_t i=0; i<ir_matches.size(); i++)
+         {
+             file << to_string(ir_matches[i].queryIdx) << " " << to_string(ir_matches[i].trainIdx) << "\n" ;
+         }
+         file.close();
 
-        return nmatches;
+         // int last_slash = F.irkpFilename.find_last_of("/");
+         // string F_im_name = F.irkpFilename.substr(last_slash, 20) + ".png";
+         // string KF_im_name = pKF->irkpFilename.substr(last_slash, 20) + ".png";
+         // string F_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + F_im_name;
+         // string KF_img_file_name = "/home/colin/data/IR_Data/short_cart_traj" + KF_im_name;
+         // cv::Mat F_img = cv::imread(F_img_file_name, cv::IMREAD_UNCHANGED);
+         // cv::Mat KF_img = cv::imread(KF_img_file_name, cv::IMREAD_UNCHANGED);
+         // cv::Mat img_matches;
+         // cv::drawMatches(F_img, F.mvKeys, KF_img, pKF->mvKeys, ir_matches, img_matches, cv::Scalar::all(-1),
+         //                 cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+         // imshow("Frame: " + F_im_name + " , KFrame: " + KF_im_name, img_matches);
+         // // save output
+         // std::string save_path = "/home/colin/data/" + F_im_name.substr(1,19) + "_" + KF_im_name.substr(1);
+         // cv::imwrite(save_path, img_matches);
+         // cv::waitKey();
+
+         return nmatches;
     }
 
     int ORBmatcher::SearchByProjection(KeyFrame* pKF, Sophus::Sim3f &Scw, const vector<MapPoint*> &vpPoints,
@@ -779,6 +794,16 @@ namespace ORB_SLAM3
             }
 
         }
+
+        // //save matches to file
+        // ofstream file;
+        // file.open("/home/colin/Software/ORB_SLAM3/Matches.txt");
+        // for(size_t i=0; i<vnMatches12.size(); i++)
+        // {
+        //     file << to_string(i) << " " << to_string(vnMatches12[i]) << "\n" ;
+        // }
+        // file.close();
+
 
         //Update prev matched
         for(size_t i1=0, iend1=vnMatches12.size(); i1<iend1; i1++)
