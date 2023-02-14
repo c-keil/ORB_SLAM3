@@ -185,7 +185,7 @@ int main(int argc, char **argv)
     // }
     // else
     // {
-    SLAM.SaveTrajectoryEuRoC("CameraTrajectory.txt");
+    SLAM.SaveTrajectoryEuRoC("/home/colin/Software/ORB_SLAM3/CameraTrajectory.txt");
     SLAM.SaveKeyFrameTrajectoryEuRoC("KeyFrameTrajectory.txt");
     // }
 
@@ -201,6 +201,8 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
     fTimes.open(strPathTimes.c_str());
     vTimeStamps.reserve(5000);
     vstrImages.reserve(5000);
+    bool first_time = true;
+    string desc_file_type = ".npy";
     while(!fTimes.eof())
     {
         string s;
@@ -209,9 +211,24 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
         {
             stringstream ss;
             ss << s;
+
+            //check if npy file or text file option
+            if (first_time) 
+            {
+                string desc_filename = strImagePath + "/descriptors/" + ss.str() + "_desc" + desc_file_type;
+                ifstream temp_file;
+                temp_file.open(desc_filename);
+                if (!temp_file)
+                {
+                    desc_file_type = ".txt";
+                }
+                first_time = false;
+            }
+
             vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
             vstrKP.push_back(strImagePath + "/keypoints/" + ss.str() + "_kp.txt");
-            vstrDesc.push_back(strImagePath + "/descriptors/" + ss.str() + "_desc.txt");
+            vstrDesc.push_back(strImagePath + "/descriptors/" + ss.str() + "_desc" + desc_file_type);
+
             double t;
             ss >> t;
             vTimeStamps.push_back(t*1e-9);

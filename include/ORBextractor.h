@@ -28,6 +28,9 @@
 namespace ORB_SLAM3
 {
 
+void readNPY(std::string const &data_fname, cv::Mat &out);
+
+
 class ExtractorNode
 {
 public:
@@ -85,6 +88,8 @@ public:
     }
 
     std::vector<cv::Mat> mvImagePyramid;
+
+
 
 
 protected:

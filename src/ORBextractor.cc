@@ -61,6 +61,7 @@
 #include <fstream>
 
 #include "ORBextractor.h"
+#include "cnpy.h"
 
 
 using namespace cv;
@@ -1113,7 +1114,7 @@ namespace ORB_SLAM3
         {
             while (std::getline(kp_file, line))
             {   
-                if (numKpRead == nfeatures) break;
+                // if (numKpRead == nfeatures) break;
 
                 row.clear();
                 std::stringstream str(line);
@@ -1146,33 +1147,43 @@ namespace ORB_SLAM3
         _descriptors.create(rows, cols, CV_32F);
         cv::Mat descriptors = _descriptors.getMat();
 
-        // read descriptor files
-        std::fstream desc_file(descFilename, std::ios::in);
-        // std::cout << "Reading: " << descFilename << std::endl;
-        row_index = 0;
-        if (desc_file.is_open())
+        //account for npy file type
+        if (descFilename.substr(descFilename.length()-4, 4) == ".npy")
         {
-            while (std::getline(desc_file, line))
-            {
-                if (row_index == descriptors.rows) break;
-                cv::Mat desc;
-                std::stringstream str(line);
-
-                while (std::getline(str, word, ' '))
-                {
-                    desc.push_back(float(stod(word)));
-                }
-
-                cv::Mat desct = desc.t();
-                desct.copyTo(descriptors.row(row_index));
-                row_index++;
-            }
+            readNPY(descFilename, descriptors);
+            assert(descriptors.cols == 256);
         }
-        else
-            std::cout << "Could not open the descriptor file\n";
-        // std::cout << "Read " << row_index << " descriptors" << std::endl;
-        assert(row_index == numKpRead );
+        else if (descFilename.substr(descFilename.length() - 4, 4) == ".txt")
+        {
 
+            // read descriptor files
+            std::fstream desc_file(descFilename, std::ios::in);
+            // std::cout << "Reading: " << descFilename << std::endl;
+            row_index = 0;
+            if (desc_file.is_open())
+            {
+                while (std::getline(desc_file, line))
+                {
+                    if (row_index == descriptors.rows) break;
+                    cv::Mat desc;
+                    std::stringstream str(line);
+
+                    while (std::getline(str, word, ' '))
+                    {
+                        desc.push_back(float(stod(word)));
+                    }
+
+                    cv::Mat desct = desc.t();
+                    desct.copyTo(descriptors.row(row_index));
+                    row_index++;
+                }
+            }
+            else
+                std::cout << "Could not open the descriptor file\n";
+        }
+        // std::cout << "Read " << row_index << " descriptors" << std::endl;
+        assert(descriptors.rows == numKpRead);
+        // std::cout << descriptors.row(0) << std::endl;
         monoIndex = keypoints.size(); //TODO IR confirm this is appropriate
         nkeypoints = keypoints.size();
         // _keypoints = vector<cv::KeyPoint>(nkeypoints);
@@ -1277,6 +1288,20 @@ namespace ORB_SLAM3
             }
         }
 
+    }
+
+    void readNPY(std::string const &data_fname, cv::Mat &out)
+    {
+        // Load the data from file
+        cnpy::NpyArray npy_data = cnpy::npy_load(data_fname);
+
+        // Get pointer to data
+        float *ptr = npy_data.data<float>();
+        int num_rows = npy_data.shape[0];
+        int num_cols = npy_data.shape[1];
+        cv::Mat tmp;
+        tmp = cv::Mat(num_rows, num_cols, CV_32F, ptr).clone();
+        tmp.copyTo(out);
     }
 
 } //namespace ORB_SLAM
