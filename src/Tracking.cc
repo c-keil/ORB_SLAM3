@@ -30,6 +30,7 @@
 #include "GeometricTools.h"
 
 #include <iostream>
+#include <string>
 
 #include <mutex>
 #include <chrono>
@@ -1953,6 +1954,7 @@ void Tracking::Track()
                     Verbose::PrintMess("TRACK: Track with motion model", Verbose::VERBOSITY_DEBUG);
                     bOK = TrackWithMotionModel();
                     if(!bOK)
+                        cout << "tracking with motion model failed, trying reference kf method" << endl;  
                         bOK = TrackReferenceKeyFrame();
                 }
 
@@ -2050,10 +2052,12 @@ void Tracking::Track()
                     // In last frame we tracked enough MapPoints in the map
                     if(mbVelocity)
                     {
+                        Verbose::PrintMess("Tracking::Track() -- Has velocity, tracking with motion model", Verbose::VERBOSITY_DEBUG);
                         bOK = TrackWithMotionModel();
                     }
                     else
                     {
+                        Verbose::PrintMess("Tracking::Track() -- bad velocity, tracking with refKF", Verbose::VERBOSITY_DEBUG);
                         bOK = TrackReferenceKeyFrame();
                     }
                 }
@@ -2602,14 +2606,14 @@ void Tracking::CreateInitialMapMonocular()
     // Scale points
     vector<MapPoint*> vpAllMapPoints = pKFini->GetMapPointMatches();
     for(size_t iMP=0; iMP<vpAllMapPoints.size(); iMP++)
-    {
-        if(vpAllMapPoints[iMP])
         {
+        if(vpAllMapPoints[iMP])
+            {
             MapPoint* pMP = vpAllMapPoints[iMP];
             pMP->SetWorldPos(pMP->GetWorldPos()*invMedianDepth);
-            pMP->UpdateNormalAndDepth();
+                pMP->UpdateNormalAndDepth();
+            }
         }
-    }
 
     if (mSensor == System::IMU_MONOCULAR)
     {
@@ -2729,7 +2733,7 @@ bool Tracking::TrackReferenceKeyFrame()
     vector<MapPoint*> vpMapPointMatches;
 
     int nmatches = matcher.SearchByBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
-
+    Verbose::PrintMess("Tracking::TrackReferenceKeyFrame -- nmatches from BoW : " + to_string(nmatches) , Verbose::VERBOSITY_DEBUG);
     if(nmatches<15)
     {
         cout << "TRACK_REF_KF: Less than 15 matches!!\n";
@@ -2743,7 +2747,7 @@ bool Tracking::TrackReferenceKeyFrame()
 
 
     // cout << " TrackReferenceKeyFrame mLastFrame.mTcw:  " << mLastFrame.mTcw << endl;
-    cout << nmatches << " matches found before optimization" << endl;
+    Verbose::PrintMess("Tracking::TrackReferenceKeyFrame -- " + to_string(nmatches) + " matches found before optimization", Verbose::VERBOSITY_DEBUG);
     Optimizer::PoseOptimization(&mCurrentFrame);
 
     // Discard outliers
@@ -2773,7 +2777,8 @@ bool Tracking::TrackReferenceKeyFrame()
                 nmatchesMap++;
         }
     }
-    cout << nmatchesMap << " matches found to the map" << endl;
+    Verbose::PrintMess("Tracking::TrackReferenceKeyFrame -- " + to_string(nmatchesMap) + " matches found to the map", Verbose::VERBOSITY_DEBUG);
+    // cout << nmatchesMap << " matches found to the map" << endl;
 
     if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
         return true;
@@ -2887,6 +2892,7 @@ bool Tracking::TrackWithMotionModel()
         th=15;
 
     int nmatches = matcher.SearchByProjection(mCurrentFrame,mLastFrame,th,mSensor==System::MONOCULAR || mSensor==System::IMU_MONOCULAR);
+    Verbose::PrintMess("Tracking::TrackWithMotionModel -- SearchByProjection found " + to_string(nmatches), Verbose::VERBOSITY_DEBUG);
 
     // If few matches, uses a wider window search
     if(nmatches<20)
@@ -2936,6 +2942,7 @@ bool Tracking::TrackWithMotionModel()
                 nmatchesMap++;
         }
     }
+    Verbose::PrintMess("Tracking::TrackWithMotionModel -- " + to_string(nmatchesMap) + " matches found to the map, nmatches = " + to_string(nmatches), Verbose::VERBOSITY_DEBUG);
 
     if(mbOnlyTracking)
     {
@@ -2955,6 +2962,7 @@ bool Tracking::TrackLocalMap()
     // We have an estimation of the camera pose and some map points tracked in the frame.
     // We retrieve the local map and try to find matches to points in the local map.
     mTrackedFr++;
+    Verbose::PrintMess("Tracking::TrackLocalMap -- Entering Track Local Map", Verbose::VERBOSITY_DEBUG);
 
     UpdateLocalMap();
     SearchLocalPoints();
@@ -3026,6 +3034,7 @@ bool Tracking::TrackLocalMap()
                 mCurrentFrame.mvpMapPoints[i] = static_cast<MapPoint*>(NULL);
         }
     }
+    Verbose::PrintMess("Tracking::TrackLocalMap --  Found " + to_string(mnMatchesInliers) + " inliers", Verbose::VERBOSITY_DEBUG);
 
     // Decide if the tracking was succesful
     // More restrictive if there was a relocalization recently
@@ -3345,6 +3354,7 @@ void Tracking::CreateNewKeyFrame()
 
 void Tracking::SearchLocalPoints()
 {
+    Verbose::PrintMess("Tracking::SearchLocalPoints -- Entering Track SearchLocalPoints", Verbose::VERBOSITY_DEBUG);
     // Do not search map points already matched
     for(vector<MapPoint*>::iterator vit=mCurrentFrame.mvpMapPoints.begin(), vend=mCurrentFrame.mvpMapPoints.end(); vit!=vend; vit++)
     {
@@ -3387,6 +3397,7 @@ void Tracking::SearchLocalPoints()
             mCurrentFrame.mmProjectPoints[pMP->mnId] = cv::Point2f(pMP->mTrackProjX, pMP->mTrackProjY);
         }
     }
+    Verbose::PrintMess("Tracking::SearchLocalPoints -- bToMatch = " + to_string(nToMatch), Verbose::VERBOSITY_DEBUG);
 
     if(nToMatch>0)
     {
@@ -3414,11 +3425,14 @@ void Tracking::SearchLocalPoints()
             th=15; // 15
 
         int matches = matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th, mpLocalMapper->mbFarPoints, mpLocalMapper->mThFarPoints);
+        Verbose::PrintMess("Tracking::SearchLocalPoints -- " + to_string(matches) + " matches found with SerchByProjection", Verbose::VERBOSITY_DEBUG);
     }
 }
 
 void Tracking::UpdateLocalMap()
 {
+    Verbose::PrintMess("Tracking::UpdateLocalMap -- Entering Track UpdateLocalMap", Verbose::VERBOSITY_DEBUG);
+
     // This is for visualization
     mpAtlas->SetReferenceMapPoints(mvpLocalMapPoints);
 
@@ -3429,6 +3443,8 @@ void Tracking::UpdateLocalMap()
 
 void Tracking::UpdateLocalPoints()
 {
+    Verbose::PrintMess("Tracking::UpdateLocalPoints -- Entering Track UpdateLocalPoints", Verbose::VERBOSITY_DEBUG);
+
     mvpLocalMapPoints.clear();
 
     int count_pts = 0;
@@ -3454,11 +3470,13 @@ void Tracking::UpdateLocalPoints()
             }
         }
     }
+    Verbose::PrintMess("Tracking::UpdateLocalPoints -- added " + to_string(count_pts) + " to mvpLocalMapPoints", Verbose::VERBOSITY_DEBUG);
 }
 
 
 void Tracking::UpdateLocalKeyFrames()
 {
+    Verbose::PrintMess("Tracking::UpdateLocalKeyFrames -- Entering UpdateLocalKeyFrames", Verbose::VERBOSITY_DEBUG);
     // Each map point vote for the keyframes in which it has been observed
     map<KeyFrame*,int> keyframeCounter;
     if(!mpAtlas->isImuInitialized() || (mCurrentFrame.mnId<mnLastRelocFrameId+2))
