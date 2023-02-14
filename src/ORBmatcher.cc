@@ -1726,6 +1726,8 @@ namespace ORB_SLAM3
 
     int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono)
     {
+        //called during normal operation to track between 2 frames. 
+        //Attempts to match map points in this frame to map points in the previous frame
         int nmatches = 0;
 
         // Rotation Histogram (to check rotation consistency)
@@ -1742,6 +1744,9 @@ namespace ORB_SLAM3
 
         const bool bForward = tlc(2)>CurrentFrame.mb && !bMono;
         const bool bBackward = -tlc(2)>CurrentFrame.mb && !bMono;
+
+        //match tracking analysis
+        vector<cv::DMatch> cv_matches;
 
         for(int i=0; i<LastFrame.N; i++)
         {
@@ -1822,6 +1827,7 @@ namespace ORB_SLAM3
                     {
                         CurrentFrame.mvpMapPoints[bestIdx2]=pMP;
                         nmatches++;
+                        cv_matches.push_back(cv::DMatch(bestIdx2, i, 0.0));
 
                         if(mbCheckOrientation)
                         {
@@ -1933,6 +1939,10 @@ namespace ORB_SLAM3
                 }
             }
         }
+
+        //write matches to file
+        string fname = "/home/colin/Software/ORB_SLAM3/matches/" + get_timestamp(CurrentFrame.irkpFilename) + ".txt";
+        write_matches_to_file(cv_matches, fname, CurrentFrame.irkpFilename, LastFrame.irkpFilename);
 
         return nmatches;
     }
@@ -2124,6 +2134,25 @@ namespace ORB_SLAM3
         double dist = cv::norm(a, b, cv::NORM_L2);
 
         return dist;
+    }
+
+    string get_timestamp(string file_name)
+    {
+        int last_slash = file_name.find_last_of("/");
+        return file_name.substr(last_slash, 20);
+    }
+
+    void write_matches_to_file(std::vector<cv::DMatch> matches, string file_name, string im1name, string im2name)
+    {
+        ofstream file;
+        file.open(file_name);
+        file << im1name << "\n";
+        file << im2name << "\n";
+        for (size_t i = 0; i < matches.size(); i++)
+        {
+            file << to_string(matches[i].queryIdx) << " " << to_string(matches[i].trainIdx) << "\n";
+        }
+        file.close();
     }
 
 } //namespace ORB_SLAM

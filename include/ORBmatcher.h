@@ -104,6 +104,9 @@ namespace ORB_SLAM3
         bool mbCheckOrientation;
     };
 
+    void write_matches_to_file(std::vector<cv::DMatch> matches, string file_name, string im1name, string im2name);
+    string get_timestamp(string file_name);
+
 }// namespace ORB_SLAM
 
 #endif // ORBMATCHER_H
