@@ -29,12 +29,13 @@ Camera1.k1: -0.470302508
 Camera1.k2: 0.3010578604
 Camera1.p1: 0.00468835914
 Camera1.p2: -0.00165573977
+Camera1.p3: -0.12437411 #from jagat
 
 Camera.width: 640
 Camera.height: 512
 
-Camera.newWidth: 600
-Camera.newHeight: 350
+Camera.newWidth: 640
+Camera.newHeight: 512
 
 # Camera frames per second 
 Camera.fps: 20 #TODO change this for other files
