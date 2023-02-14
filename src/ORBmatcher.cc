@@ -434,16 +434,15 @@ namespace ORB_SLAM3
         }
 
         // write matches to file for confirmation
-         //save matches to file
-         ofstream file;
-         file.open("/home/colin/Software/ORB_SLAM3/BoWMatches.txt");
-         file << F.irkpFilename << "\n";
-         file << pKF->irkpFilename << "\n";
-         for(size_t i=0; i<ir_matches.size(); i++)
-         {
-             file << to_string(ir_matches[i].queryIdx) << " " << to_string(ir_matches[i].trainIdx) << "\n" ;
-         }
-         file.close();
+        //  ofstream file;
+        //  file.open("/home/colin/Software/ORB_SLAM3/BoWMatches.txt");
+        //  file << F.irkpFilename << "\n";
+        //  file << pKF->irkpFilename << "\n";
+        //  for(size_t i=0; i<ir_matches.size(); i++)
+        //  {
+        //      file << to_string(ir_matches[i].queryIdx) << " " << to_string(ir_matches[i].trainIdx) << "\n" ;
+        //  }
+        //  file.close();
 
          // int last_slash = F.irkpFilename.find_last_of("/");
          // string F_im_name = F.irkpFilename.substr(last_slash, 20) + ".png";
@@ -1940,8 +1939,8 @@ namespace ORB_SLAM3
         }
 
         //write matches to file
-        string fname = "/home/colin/Software/ORB_SLAM3/matches/" + get_timestamp(CurrentFrame.irkpFilename) + ".txt";
-        write_matches_to_file(cv_matches, fname, CurrentFrame.irkpFilename, LastFrame.irkpFilename);
+        // string fname = "/home/colin/Software/ORB_SLAM3/matches/" + get_timestamp(CurrentFrame.irkpFilename) + ".txt";
+        // write_matches_to_file(cv_matches, fname, CurrentFrame.irkpFilename, LastFrame.irkpFilename);
 
         return nmatches;
     }
