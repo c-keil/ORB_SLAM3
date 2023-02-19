@@ -203,6 +203,7 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
     vstrImages.reserve(5000);
     bool first_time = true;
     string desc_file_type = ".npy";
+    string kp_file_type = ".npy";
     while(!fTimes.eof())
     {
         string s;
@@ -222,11 +223,22 @@ void LoadImages(const string &strImagePath, const string &strPathTimes,
                 {
                     desc_file_type = ".txt";
                 }
+                temp_file.close();
+
+                string kp_filename = strImagePath + "/keypoints/" + ss.str() + "_kp" + kp_file_type;
+                temp_file.open(kp_filename);
+                if (!temp_file)
+                {
+                    kp_file_type = ".txt";
+                }
+                temp_file.close();
+
                 first_time = false;
             }
 
             vstrImages.push_back(strImagePath + "/" + ss.str() + ".png");
-            vstrKP.push_back(strImagePath + "/keypoints/" + ss.str() + "_kp.txt");
+            vstrKP.push_back(strImagePath + "/keypoints/" + ss.str() + "_kp" + kp_file_type);
+            // vstrKP.push_back(strImagePath + "/keypoints/" + ss.str() + "_kp.txt");
             vstrDesc.push_back(strImagePath + "/descriptors/" + ss.str() + "_desc" + desc_file_type);
 
             double t;
