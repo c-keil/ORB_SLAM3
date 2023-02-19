@@ -29,7 +29,7 @@ namespace ORB_SLAM3
 {
 
 void readNPY(std::string const &data_fname, cv::Mat &out);
-
+void readKpNPY(std::string const &data_fname, std::vector<cv::KeyPoint> &keypoints);
 
 class ExtractorNode
 {

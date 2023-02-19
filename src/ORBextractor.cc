@@ -1100,50 +1100,61 @@ namespace ORB_SLAM3
         ComputePyramid(image);
 
         int monoIndex = 0;
-        int nkeypoints = 0;
+        int nkeypoints;
+        vector<double> row;
+        string line, word;
 
         //load keypoints
         vector<KeyPoint> keypoints;
-        vector<double> row;
-        string line, word;
-        KeyPoint kp;
         int numKpRead = 0;
-        std::fstream kp_file(kpFilename, ios::in);
-        // std::cout << "Reading: " << kpFilename << std::endl;
-        if (kp_file.is_open())
+        if (kpFilename.substr(kpFilename.length() - 4, 4) == ".npy")
         {
-            while (std::getline(kp_file, line))
-            {   
-                // if (numKpRead == nfeatures) break;
+            readKpNPY(kpFilename, keypoints);
+            numKpRead = keypoints.size();
 
-                row.clear();
-                std::stringstream str(line);
+        }
+        else if (kpFilename.substr(kpFilename.length() - 4, 4) == ".txt")
+        {
+            KeyPoint kp;
+            std::fstream kp_file(kpFilename, ios::in);
+            // std::cout << "Reading: " << kpFilename << std::endl;
+            if (kp_file.is_open())
+            {
+                while (std::getline(kp_file, line))
+                {   
+                    // if (numKpRead == nfeatures) break;
 
-                while (std::getline(str, word, ' '))
-                {
-                    row.push_back(stod(word));
+                    row.clear();
+                    std::stringstream str(line);
+
+                    while (std::getline(str, word, ' '))
+                    {
+                        row.push_back(stod(word));
+                    }
+                    kp.pt.x = row[0];
+                    kp.pt.y = row[1];
+                    kp.size = row[2];
+                    kp.angle = row[3];
+                    kp.response = row[4];
+                    kp.octave = row[5];
+                    kp.class_id = row[6];
+                    keypoints.push_back(kp);
+                    numKpRead++;
                 }
-                kp.pt.x = row[0];
-                kp.pt.y = row[1];
-                kp.size = row[2];
-                kp.angle = row[3];
-                kp.response = row[4];
-                kp.octave = row[5];
-                kp.class_id = row[6];
-                keypoints.push_back(kp);
-                numKpRead++;
             }
+            else
+                std::cout << "Could not open keypoint file\n";
         }
         else
-            std::cout << "Could not open keypoint file\n";
-        // assert(numKpRead == nfeatures);
+        {
+            std::cout << "Could not open the kp file:\n" << kpFilename << std::endl;
+        }
         // std::cout << "Read " << numKpRead << " keypoins" << std::endl;
 
         // load descriptors
         // descriptor matrix params
         int rows = numKpRead; 
         int cols = 256;
-        int row_index = 0;
         _descriptors.create(rows, cols, CV_32F);
         cv::Mat descriptors = _descriptors.getMat();
 
@@ -1151,15 +1162,14 @@ namespace ORB_SLAM3
         if (descFilename.substr(descFilename.length()-4, 4) == ".npy")
         {
             readNPY(descFilename, descriptors);
-            assert(descriptors.cols == 256);
+            assert(descriptors.cols == cols);
         }
         else if (descFilename.substr(descFilename.length() - 4, 4) == ".txt")
         {
 
-            // read descriptor files
+            int row_index = 0;
             std::fstream desc_file(descFilename, std::ios::in);
             // std::cout << "Reading: " << descFilename << std::endl;
-            row_index = 0;
             if (desc_file.is_open())
             {
                 while (std::getline(desc_file, line))
@@ -1181,8 +1191,12 @@ namespace ORB_SLAM3
             else
                 std::cout << "Could not open the descriptor file\n";
         }
+        else
+        {
+            std::cout << "Could not open the descriptor file:\n" << descFilename << std::endl;
+        }
         // std::cout << "Read " << row_index << " descriptors" << std::endl;
-        assert(descriptors.rows == numKpRead);
+        assert(descriptors.rows == keypoints.size());
         // std::cout << descriptors.row(0) << std::endl;
         monoIndex = keypoints.size(); //TODO IR confirm this is appropriate
         nkeypoints = keypoints.size();
@@ -1302,6 +1316,20 @@ namespace ORB_SLAM3
         cv::Mat tmp;
         tmp = cv::Mat(num_rows, num_cols, CV_32F, ptr).clone();
         tmp.copyTo(out);
+    }
+
+    void readKpNPY(std::string const &data_fname, std::vector<cv::KeyPoint> &keypoints)
+    {
+        cnpy::NpyArray npy_data = cnpy::npy_load(data_fname);
+        keypoints.clear();
+        std::vector<float> data;
+        float *ptr = npy_data.data<float>();
+
+        for (std::size_t i = 0; i < npy_data.shape[0]; i++)
+        {
+            std::size_t i2 = i * 2;
+            keypoints.push_back(cv::KeyPoint(ptr[i2], ptr[i2 + 1], 1.0));
+        }
     }
 
 } //namespace ORB_SLAM
