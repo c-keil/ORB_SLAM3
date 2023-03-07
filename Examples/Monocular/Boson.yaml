@@ -20,16 +20,29 @@ File.version: "1.0"
 Camera.type: "PinHole"
 
 # Camera calibration and distortion parameters (OpenCV) 
-Camera1.fx: 524.888150
-Camera1.fy: 521.776791
-Camera1.cx: 325.5969897
-Camera1.cy: 242.392342
+# Camera1.fx: 524.888150
+# Camera1.fy: 521.776791
+# Camera1.cx: 325.5969897
+# Camera1.cy: 242.392342
 
-Camera1.k1: -0.470302508
-Camera1.k2: 0.3010578604
-Camera1.p1: 0.00468835914
-Camera1.p2: -0.00165573977
-Camera1.k3: -0.12437411 #from jagat
+
+
+# Camera1.k1: -0.470302508
+# Camera1.k2: 0.3010578604
+# Camera1.p1: 0.00468835914
+# Camera1.p2: -0.00165573977
+# # Camera1.k3: -0.12437411 #from jagat
+
+#new
+Camera1.cx: 334.87808955
+Camera1.cy: 238.14818161
+Camera1.fx: 511.20265431
+Camera1.fy: 511.2762746
+Camera1.k1: -0.447770531
+Camera1.k2: 0.246827214
+Camera1.p1: -5.33110197e-05
+Camera1.p2: 0.00122241636
+Camera1.p3: -0.0719141092
 
 Camera.width: 640
 Camera.height: 512
@@ -38,7 +51,7 @@ Camera.newWidth: 640
 Camera.newHeight: 512
 
 # Camera frames per second 
-Camera.fps: 500 #TODO change this for other files
+Camera.fps: 60 #TODO change this for other files
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
