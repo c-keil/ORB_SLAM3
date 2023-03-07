@@ -795,13 +795,14 @@ namespace ORB_SLAM3
 
         // //save matches to file
         // ofstream file;
-        // file.open("/home/colin/Software/ORB_SLAM3/Matches.txt");
+        // file.open("/home/colin/Software/ORB_SLAM3/InitMatches.txt");
         // for(size_t i=0; i<vnMatches12.size(); i++)
         // {
         //     file << to_string(i) << " " << to_string(vnMatches12[i]) << "\n" ;
         // }
         // file.close();
-
+        // cout << "ORBmatcher::SearchForInitialization -- found " << nmatches << " matches" << endl;
+        // cout << "ORBmatcher::SearchForInitialization -- frames\n" << F1.irkpFilename << endl << F2.irkpFilename << endl;
 
         //Update prev matched
         for(size_t i1=0, iend1=vnMatches12.size(); i1<iend1; i1++)
