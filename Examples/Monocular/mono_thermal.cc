@@ -17,7 +17,7 @@
 */
 
 /*
-This script is used to load termal image datasets
+This script is used to load superpoint image datasets -- modified by Colin Keil
 */
 
 #include<iostream>
