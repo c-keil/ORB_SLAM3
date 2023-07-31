@@ -24,6 +24,12 @@ cd build
 cmake .. -DCMAKE_BUILD_TYPE=Debug
 make -j
 
+cd ../../cnpy
+mkdir build
+cd build
+cmake ..
+make -j
+
 cd ../../../
 
 echo "Uncompress vocabulary ..."
@@ -32,9 +38,11 @@ cd Vocabulary
 tar -xf ORBvoc.txt.tar.gz
 cd ..
 
-echo "Configuring and building ORB_SLAM3 ..."
 
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DOpenCV_DIR=/home/auv/software/opencv/build
-make -j4
+
+# echo "Configuring and building ORB_SLAM3 ..."
+
+# mkdir build
+# cd build
+# cmake .. -DCMAKE_BUILD_TYPE=Debug -DOpenCV_DIR=/home/auv/software/opencv/build
+# make -j4
